@@ -5,6 +5,7 @@ require('babel-polyfill')
 // require('newrelic')
 
 const restify = require('restify')
+const config = require('configure')
 const logger = require('./helpers/logger.js')
 const mongo = require('./helpers/mongo.js')
 const {setupRoutes, setupErrorHandling} = require('./routes.js')
@@ -18,7 +19,8 @@ server.use(restify.queryParser())
 server.use(restify.bodyParser())
 setupRoutes(server)
 setupErrorHandling(server)
-server.listen(8080, () => logger.info('Server listening on port 8080'))
+const port = config.server.port || 8080;
+server.listen(port, () => logger.info('Server listening on port ' + port))
 
 // Export the server for testing purposes
 module.exports = server
