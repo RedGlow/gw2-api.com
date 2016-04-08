@@ -8,13 +8,13 @@ const skinWorker = require('./workers/skin.js')
 const recipeWorker = require('./workers/recipe.js')
 
 const workers = [
-  { condition: config.startItemWorker,
+  { condition: config.workers.startItem,
     method: itemWorker.initialize },
-  { condition: config.startGemWorker,
+  { condition: config.workers.startGem,
     method: itemWorker.initialize },
-  { condition: config.startSkinWorker,
+  { condition: config.workers.startSkin,
     method: itemWorker.initialize },
-  { condition: config.startRecipeWorker,
+  { condition: config.workers.startRecipe,
     method: itemWorker.initialize }
 ]
 

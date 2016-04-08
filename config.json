@@ -1,6 +1,8 @@
 {
-    "startItemWorker": true,
-    "startGemWorker": true,
-    "startSkinWorker": true,
-    "startRecipeWorker": true
+    "workers": {
+        "startItem": true,
+        "startGem": true,
+        "startSkin": true,
+        "startRecipe": true
+    }
 }
