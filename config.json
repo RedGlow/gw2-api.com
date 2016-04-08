@@ -1,7 +1,8 @@
 {
     "workers": {
         "item": {
-            "start": true
+            "start": true,
+            "reducedMemory": true
         },
         "gem": {
             "start": true

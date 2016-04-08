@@ -1,4 +1,5 @@
 const fetch = require('isomorphic-fetch');
+const config = require('configure')
 const logger = require('../helpers/logger.js')
 const mongo = require('../helpers/mongo.js')
 const {execute, schedule} = require('../helpers/workers.js')
@@ -15,13 +16,19 @@ async function initialize () {
   collection.createIndex('lang')
   let exists = !!(await collection.find({}).limit(1).next())
 
+  let loadItemsFunction = config.workers.item.reducedMemory ?
+    reducedMemoryLoadItems :
+    loadItems;
+
   if (!exists) {
-    await execute(reducedMemoryLoadItems)
+    logger.info('not exist!')
+    await execute(loadItemsFunction)
+    logger.info('done not exist')
     await execute(loadItemPrices)
   }
 
   // Update the items once a day, at 2am
-  schedule('0 0 2 * * *', reducedMemoryLoadItems, 60 * 60)
+  schedule('0 0 2 * * *', loadItemsFunction, 60 * 60)
 
   // Update prices every 5 minutes (which is the gw2 cache time)
   schedule('*/5 * * * *', loadItemPrices)
