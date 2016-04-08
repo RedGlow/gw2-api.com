@@ -33,11 +33,8 @@ function anyMethod (server, url, callback) {
   if ( (!configEndpoints.enabled && !configEndpoints.disabled) ||
        (!!configEndpoints.enabled && !configEndpoints.disabled && configEndpoints.enabled.indexOf(url) >= 0) ||
        (!!configEndpoints.disabled && !configEndpoints.enabled && configEndpoints.disabled.indexOf(url) < 0) ) {
-    logger.info('Adding ' + url);
     server.get(url, callback)
     server.post(url, callback)
-  } else {
-    logger.info('Not adding ' + url)
   }
 }
 
