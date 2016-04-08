@@ -11,11 +11,11 @@ const workers = [
   { condition: config.workers.item.start,
     method: itemWorker.initialize },
   { condition: config.workers.gem.start,
-    method: itemWorker.initialize },
+    method: gemWorker.initialize },
   { condition: config.workers.skin.start,
-    method: itemWorker.initialize },
+    method: skinWorker.initialize },
   { condition: config.workers.recipe.start,
-    method: itemWorker.initialize }
+    method: recipeWorker.initialize }
 ]
 
 // Connect to the DB and get working! :)
