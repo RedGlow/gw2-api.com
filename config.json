@@ -15,5 +15,9 @@
         "recipe": {
             "start": true
         }
+    },
+    "server": {
+        "endpoints": {
+        }
     }
 }

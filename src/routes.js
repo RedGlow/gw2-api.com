@@ -1,3 +1,5 @@
+const config = require('configure')
+const configEndpoints = config.server.endpoints
 const logger = require('./helpers/logger.js')
 const item = require('./controllers/item.js')
 const gem = require('./controllers/gem.js')
@@ -5,6 +7,9 @@ const skin = require('./controllers/skin.js')
 const recipe = require('./controllers/recipe.js')
 
 function setupRoutes (server) {
+  if (!!configEndpoints.enabled && !!configEndpoints.disabled) {
+    throw new Error('Cannot set both server.endpoints.enabled and server.endpoints.disabled in configuration file');
+  }
   server.get('/', (req, res, next) => res.redirect('https://github.com/gw2efficiency/gw2-api.com/', next))
   anyMethod(server, '/item', wrapRequest(item.byId))
   anyMethod(server, '/item/:id', wrapRequest(item.byId))
@@ -25,8 +30,15 @@ function setupRoutes (server) {
 
 // Adds get and post routes for a single url
 function anyMethod (server, url, callback) {
-  server.get(url, callback)
-  server.post(url, callback)
+  if ( (!configEndpoints.enabled && !configEndpoints.disabled) ||
+       (!!configEndpoints.enabled && !configEndpoints.disabled && configEndpoints.enabled.indexOf(url) >= 0) ||
+       (!!configEndpoints.disabled && !configEndpoints.enabled && configEndpoints.disabled.indexOf(url) < 0) ) {
+    logger.info('Adding ' + url);
+    server.get(url, callback)
+    server.post(url, callback)
+  } else {
+    logger.info('Not adding ' + url)
+  }
 }
 
 // Wrap a request to offer a easier to use interface
