@@ -1,3 +1,4 @@
+const fetch = require('isomorphic-fetch');
 const logger = require('../helpers/logger.js')
 const mongo = require('../helpers/mongo.js')
 const {execute, schedule} = require('../helpers/workers.js')
@@ -15,17 +16,48 @@ async function initialize () {
   let exists = !!(await collection.find({}).limit(1).next())
 
   if (!exists) {
-    await execute(loadItems)
+    await execute(reducedMemoryLoadItems)
     await execute(loadItemPrices)
   }
 
   // Update the items once a day, at 2am
-  schedule('0 0 2 * * *', loadItems, 60 * 60)
+  schedule('0 0 2 * * *', reducedMemoryLoadItems, 60 * 60)
 
   // Update prices every 5 minutes (which is the gw2 cache time)
   schedule('*/5 * * * *', loadItemPrices)
 
   logger.info('Initialized item worker')
+}
+
+// A memory-reduced version of loadItems. Instead of loading all the items in
+// memory, and causing a memory spike, it loads a language ad a time, splits
+// the download in pages, and finally waits for the DB to read the data to
+// write. The update thus takes longer, performing a trade-off between memory
+// and time.
+async function reducedMemoryLoadItems() {
+  let collection = mongo.collection('items')
+
+  // Iterate over all the languages
+  for(let index in languages) {
+    let lang = languages[index]
+    let endpoint = api().language(lang).items()
+
+    // Get the number of pages
+    let response = await fetch('https://api.guildwars2.com/v2/items?page=0&page_size=' + endpoint.maxPageSize)
+    let numPages = parseInt(response.headers.get('X-Page-Total'))
+
+    // Iterate over the pages
+    for(let page = 0; page < numPages; page++) {
+      let items = await endpoint.page(page)
+      let updateFunctions = []
+      items.map(async item => {
+        item = {...transformItem(item), lang: lang}
+        updateFunctions.push(() => collection.update({id: item.id, lang: lang}, {'$set': item}, {upsert: true}))
+      });
+      await async.parallel(updateFunctions)
+    }
+
+  }
 }
 
 function loadItems () {
