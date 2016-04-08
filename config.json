@@ -1,0 +1,16 @@
+{
+    "workers": {
+        "item": {
+            "start": true
+        },
+        "gem": {
+            "start": true
+        },
+        "skin": {
+            "start": true
+        },
+        "recipe": {
+            "start": true
+        }
+    }
+}
