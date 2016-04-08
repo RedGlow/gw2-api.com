@@ -1,8 +1,16 @@
 {
     "workers": {
-        "startItem": true,
-        "startGem": true,
-        "startSkin": true,
-        "startRecipe": true
+        "item": {
+            "start": true
+        },
+        "gem": {
+            "start": true
+        },
+        "skin": {
+            "start": true
+        },
+        "recipe": {
+            "start": true
+        }
     }
 }
